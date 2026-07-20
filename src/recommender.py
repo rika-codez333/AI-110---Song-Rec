@@ -97,7 +97,7 @@ class Recommender:
         if verbose:
             logger.info(f"Top-{k} recommendations:")
             for idx, (song, score) in enumerate(ranked[:k], 1):
-                logger.info(f"  {idx}. {song.title} ({song.artist}) - Score: {score:.3f}/7.8")
+                logger.info(f"  {idx}. {song.title} ({song.artist}) - Score: {score:.3f}/7.9")
 
         return [song for song, _ in ranked[:k]]
 
@@ -138,7 +138,7 @@ class Recommender:
         }
 
         score, reasons = score_song(user_prefs, song_dict, k=tuning_param, verbose=verbose)
-        explanation = f"Score: {score:.3f}/7.8\n" + "\n".join(reasons)
+        explanation = f"Score: {score:.3f}/7.9\n" + "\n".join(reasons)
 
         if verbose:
             logger.info(f"Explaining '{song.title}': {explanation.replace(chr(10), ' | ')}")
@@ -169,11 +169,11 @@ def load_songs(csv_path: str) -> List[Dict]:
 def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = False) -> Tuple[float, List[str]]:
     """Score a song against user preferences using proximity-based Gaussian similarity.
 
-    Option D Recipe: Balanced discovery with exact-match priority
-    - Genre match: +2.0 | Mood match: +1.0
-    - Energy: +1.4 | Danceability: +1.2 | Valence: +1.0
+    Option C Recipe: Balanced approach with improved genre coherence
+    - Genre match: +2.3 (improved) | Mood match: +1.0 | Mood mismatch: -0.5 (NEW)
+    - Energy: +1.2 (reduced) | Danceability: +1.2 | Valence: +1.0
     - Tempo: +0.6 | Acousticness: +0.6
-    - Max score: 7.8
+    - Max score: ~7.9
 
     Args:
         user_prefs: Reference song preferences (e.g., user's liked song or target profile)
@@ -182,13 +182,14 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
         verbose: If True, logs detailed scoring breakdown for this song
 
     Returns:
-        (score, reasons): Score (0-7.8 max) and list of contributing factors
+        (score, reasons): Score (0-7.9 max) and list of contributing factors
     """
-    # Option D: Full-balanced weighting strategy
+    # Option C: Improved weights with mood penalty for better genre coherence
     weights = {
-        'genre': 2.0,
+        'genre': 2.3,
         'mood': 1.0,
-        'energy': 1.4,
+        'mood_mismatch': -0.5,
+        'energy': 1.2,
         'danceability': 1.2,
         'valence': 1.0,
         'tempo_bpm': 0.6,
@@ -232,9 +233,12 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
         if verbose:
             logger.debug(f"  mood: MATCH +{weights['mood']:.1f}")
     else:
-        contributions['mood'] = (0.0, 0.0, song['mood'], user_prefs.get('mood'))
+        mood_penalty = weights['mood_mismatch']
+        score += mood_penalty
+        contributions['mood'] = (mood_penalty, 0.0, song['mood'], user_prefs.get('mood'))
+        reasons.append(f"⚠️ mood mismatch ({song['mood']} ≠ {user_prefs.get('mood')})")
         if verbose:
-            logger.debug(f"  mood: no match ({song['mood']} ≠ {user_prefs.get('mood')})")
+            logger.debug(f"  mood: MISMATCH {mood_penalty:.1f}")
 
     if genre_match:
         score += weights['genre']
@@ -248,7 +252,7 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
             logger.debug(f"  genre: no match ({song['genre']} ≠ {user_prefs.get('genre')})")
 
     if verbose:
-        logger.info(f"  ➜ Final score: {round(score, 3):.3f}/7.8 (max)")
+        logger.info(f"  ➜ Final score: {round(score, 3):.3f}/7.9 (max)")
 
     return round(score, 3), reasons
 
@@ -279,6 +283,6 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_para
     if verbose:
         logger.info(f"Top {k} recommendations:")
         for idx, (song, score, _) in enumerate(ranked[:k], 1):
-            logger.info(f"  {idx}. {song.get('title', 'Unknown')} - {score:.3f}/7.8")
+            logger.info(f"  {idx}. {song.get('title', 'Unknown')} - {score:.3f}/7.9")
 
     return ranked[:k]

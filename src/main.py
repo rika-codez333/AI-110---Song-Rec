@@ -12,13 +12,13 @@ You will implement the functions in recommender.py:
 from recommender import load_songs, recommend_songs
 
 
-def display_recommendations(recommendations, max_score=7.8):
+def display_recommendations(recommendations, max_score=7.9):
     """
     Display music recommendations in a clean, readable format.
 
     Args:
         recommendations: List of tuples (song_dict, score, reasons_list)
-        max_score: Maximum possible score (default 7.8)
+        max_score: Maximum possible score (default 7.9)
     """
     if not recommendations:
         print("No recommendations available.")

@@ -8,7 +8,7 @@ potential weaknesses or unexpected behavior.
 from recommender import load_songs, recommend_songs
 
 
-def display_recommendations(recommendations, max_score=7.8):
+def display_recommendations(recommendations, max_score=7.9):
     """Display music recommendations in a clean, readable format."""
     if not recommendations:
         print("No recommendations available.")
