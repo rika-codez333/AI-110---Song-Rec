@@ -7,13 +7,16 @@ Features:
 - Multiple scoring strategies (Balanced, Genre-First, Mood-First, Energy-Focused, Quality-First, Popularity-Driven)
 - Diversity penalty to avoid recommending too many songs from same artist
 - Formatted table output with visual indicators
+- Playlist generation and export (CSV/JSON)
 """
 
+from typing import List, Dict
 from .recommender import (
     load_songs, recommend_songs,
     BalancedStrategy, GenreFirstStrategy, MoodFirstStrategy,
     EnergyFocusedStrategy, QualityFirstStrategy, PopularityDrivenStrategy
 )
+from .playlist import Playlist, PlaylistGenerator
 
 
 def display_recommendations(recommendations, max_score=9.5):
@@ -151,6 +154,42 @@ def display_recommendations_table(recommendations, max_score=9.5):
 
     print("=" * 120 + "\n")
 
+def demonstrate_playlists(songs: List[Dict]) -> None:
+    """Demonstrate themed playlist generation (new feature)."""
+    print("\n\n" + "="*120)
+    print("🎵 PLAYLIST FEATURE DEMONSTRATION")
+    print("="*120)
+    print("Creating themed playlists for different contexts...\n")
+
+    themes = ["workout", "study", "sleep", "party", "relax"]
+    playlists = {}
+
+    for theme in themes:
+        playlist = PlaylistGenerator.generate_themed_playlist(songs, theme)
+        if playlist:
+            playlists[theme] = playlist
+            playlist.display()
+            print()
+
+    # Save playlists to files
+    print("="*120)
+    print("📁 SAVING PLAYLISTS TO FILES")
+    print("="*120)
+    for theme, playlist in playlists.items():
+        csv_file = f"playlists/{theme}_playlist.csv"
+        json_file = f"playlists/{theme}_playlist.json"
+        try:
+            import os
+            os.makedirs("playlists", exist_ok=True)
+            playlist.to_csv(csv_file)
+            playlist.to_json(json_file)
+            print(f"✅ {theme.capitalize()} playlist saved to {csv_file} and {json_file}")
+        except Exception as e:
+            print(f"⚠️  Could not save {theme} playlist: {e}")
+
+    print("\n")
+
+
 def main() -> None:
     songs = load_songs("data/songs.csv")
 
@@ -207,6 +246,9 @@ def main() -> None:
             print("   (Prioritizes energy and danceability over genre)")
             # Note: For this we'd need to enhance recommend_songs to accept strategy
             print("   [See Challenge 2 implementation in recommender.py for strategy pattern]")
+
+    # Demonstrate playlist creation (new feature)
+    demonstrate_playlists(songs)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,22 @@
+rank,title,artist,genre,mood,energy,danceability,added_score
+1,Samba Fire,Rio Collective,Latin,energetic,0.91,0.92,9.9
+2,Bass Drop Thunder,DJ Impulse,house,intense,0.95,0.91,9.8
+3,Sunset Soca,Carnival Vibes,soca,energetic,0.89,0.9,9.7
+4,Dancehall Energy,Kingston Sound,dancehall,intense,0.86,0.89,9.6
+5,Trance Heaven,Euphoria Soundz,trance,uplifting,0.9,0.89,9.5
+6,Gym Hero,Max Pulse,pop,intense,0.93,0.88,9.4
+7,Neon Mambo,Havana Nights,reggaeton,intense,0.89,0.88,9.3
+8,Electric Vibes,Synth Lords,electronic,energetic,0.92,0.88,9.2
+9,House Groove,Summer Nights,house,joyful,0.86,0.88,9.1
+10,Trap Energy,Beat Masters,hip-hop,intense,0.89,0.87,9.0
+11,Beach Party,Calypso Kings,calypso,joyful,0.81,0.86,8.9
+12,Dubstep Bass,Wobble Kings,dubstep,intense,0.91,0.85,8.8
+13,Electric Dreams,Synth Nexus,electronic,energetic,0.88,0.84,8.7
+14,Techno Pulse,Berlin Underground,techno,intense,0.89,0.82,8.6
+15,Afrobeat Groove,Lagos Rhythms,Afrobeat,energetic,0.84,0.81,8.5
+16,Punk Rebellion,Street Fighters,punk,energetic,0.88,0.81,8.4
+17,Liquid Drum & Bass,Smooth Vibes,drum and bass,energetic,0.84,0.8,8.3
+18,Sunrise City,Neon Echo,pop,happy,0.82,0.79,8.2
+19,Urban Beats,City Pulse,hip-hop,energetic,0.85,0.79,8.1
+20,Neon Nights,Synthwave Masters,synthwave,moody,0.81,0.76,8.0
+21,Metal Fury,Thunder Gods,metal,intense,0.95,0.72,7.9

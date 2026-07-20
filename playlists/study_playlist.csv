@@ -1,0 +1,21 @@
+rank,title,artist,genre,mood,energy,danceability,added_score
+1,String Quartet,Chamber Ensemble,classical,peaceful,0.25,0.22,9.9
+2,Classical Concerto,Vienna Orchestra,classical,peaceful,0.35,0.2,9.8
+3,Piano Nocturne,Classical Ensemble,classical,peaceful,0.22,0.15,9.7
+4,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,0.41,9.6
+5,Dark Ambient,Void Seekers,ambient,contemplative,0.18,0.25,9.5
+6,Baroque Dreams,Period Ensemble,baroque,romantic,0.4,0.28,9.4
+7,Desert Wind,Sahara Voices,world music,contemplative,0.32,0.28,9.3
+8,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,0.54,9.2
+9,Tabla Dreams,Ravi Ensemble,Indian classical,focused,0.48,0.35,9.1
+10,Ambient Flow,Space Travelers,ambient,peaceful,0.25,0.35,9.0
+11,Library Rain,Paper Lanterns,lofi,chill,0.35,0.58,8.9
+12,Folk Ballad,Countryside Echoes,folk,sad,0.35,0.42,8.8
+13,Reggae Midnight,Roots Collective,reggae,melancholic,0.48,0.58,8.7
+14,Balkan Dreams,Eastern Winds,Balkan,contemplative,0.42,0.42,8.6
+15,Folk Stories,Acoustic Wanderers,folk,contemplative,0.45,0.48,8.5
+16,Focus Flow,LoRoom,lofi,focused,0.4,0.6,8.4
+17,Whispers in the Rain,Indie Soul,indie,melancholic,0.35,0.54,8.3
+18,Country Roots,Southern Bells,country,nostalgic,0.48,0.55,8.2
+19,Midnight Melancholy,Blue Notes Trio,R&B,melancholic,0.45,0.64,8.1
+20,Mento Memories,Jamaican Heritage,mento,nostalgic,0.45,0.52,8.0

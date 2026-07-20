@@ -1,0 +1,6 @@
+rank,title,artist,genre,mood,energy,danceability,added_score
+1,Dark Ambient,Void Seekers,ambient,contemplative,0.18,0.25,9.9
+2,Piano Nocturne,Classical Ensemble,classical,peaceful,0.22,0.15,9.8
+3,Ambient Flow,Space Travelers,ambient,peaceful,0.25,0.35,9.7
+4,String Quartet,Chamber Ensemble,classical,peaceful,0.25,0.22,9.6
+5,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,0.41,9.5

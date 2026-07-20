@@ -1,0 +1,19 @@
+rank,title,artist,genre,mood,energy,danceability,added_score
+1,Classical Concerto,Vienna Orchestra,classical,peaceful,0.35,0.2,9.9
+2,String Quartet,Chamber Ensemble,classical,peaceful,0.25,0.22,9.8
+3,Baroque Dreams,Period Ensemble,baroque,romantic,0.4,0.28,9.7
+4,Piano Nocturne,Classical Ensemble,classical,peaceful,0.22,0.15,9.6
+5,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,0.54,9.5
+6,Sunset Horizon,Coastal Folk,folk,romantic,0.58,0.48,9.4
+7,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,0.41,9.3
+8,Tropical Breeze,Island Rhythms,reggae,relaxed,0.55,0.62,9.2
+9,Island Vibes,Reggae Roots,reggae,relaxed,0.58,0.64,9.1
+10,Folk Stories,Acoustic Wanderers,folk,contemplative,0.45,0.48,9.0
+11,Country Roads,Nashville Hearts,country,romantic,0.55,0.6,8.9
+12,Dub Vibes,Reggae Masters,reggae,relaxed,0.52,0.6,8.8
+13,Tabla Dreams,Ravi Ensemble,Indian classical,focused,0.48,0.35,8.7
+14,Ambient Flow,Space Travelers,ambient,peaceful,0.25,0.35,8.6
+15,Country Roots,Southern Bells,country,nostalgic,0.48,0.55,8.5
+16,Folk Ballad,Countryside Echoes,folk,sad,0.35,0.42,8.4
+17,Library Rain,Paper Lanterns,lofi,chill,0.35,0.58,8.3
+18,Desert Wind,Sahara Voices,world music,contemplative,0.32,0.28,8.2
