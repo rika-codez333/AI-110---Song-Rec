@@ -2,62 +2,62 @@
   "name": "Study Mix",
   "theme": "study",
   "description": "Focused, non-distracting music for concentration",
-  "created_at": "2026-07-20T03:17:56.226045",
+  "created_at": "2026-07-20T03:33:00.429558",
   "duration_minutes": 60.0,
   "song_count": 20,
   "stats": {
     "song_count": 20,
     "duration_minutes": 60.0,
     "genres": [
-      "country",
+      "Balkan",
+      "world music",
       "Indian classical",
-      "folk",
+      "R&B",
+      "ambient",
       "baroque",
       "mento",
+      "country",
+      "folk",
       "reggae",
-      "jazz",
-      "world music",
-      "Balkan",
-      "indie",
-      "ambient",
-      "R&B",
       "classical",
-      "lofi"
+      "lofi",
+      "jazz",
+      "indie"
     ],
     "moods": [
+      "nostalgic",
+      "chill",
       "peaceful",
+      "relaxed",
       "sad",
       "focused",
-      "romantic",
       "melancholic",
-      "contemplative",
-      "chill",
-      "relaxed",
-      "nostalgic"
+      "romantic",
+      "contemplative"
     ],
     "avg_energy": 0.36,
     "avg_danceability": 0.42,
     "artists": [
-      "Eastern Winds",
-      "Countryside Echoes",
-      "Paper Lanterns",
       "Sahara Voices",
+      "Indie Soul",
+      "Acoustic Wanderers",
+      "Chamber Ensemble",
       "Orbit Bloom",
       "Southern Bells",
-      "Chamber Ensemble",
-      "Acoustic Wanderers",
-      "Jamaican Heritage",
-      "Space Travelers",
-      "Indie Soul",
-      "LoRoom",
-      "Period Ensemble",
-      "Roots Collective",
       "Vienna Orchestra",
-      "Blue Notes Trio",
-      "Ravi Ensemble",
-      "Slow Stereo",
       "Classical Ensemble",
-      "Void Seekers"
+      "Paper Lanterns",
+      "Eastern Winds",
+      "Slow Stereo",
+      "Roots Collective",
+      "Void Seekers",
+      "LoRoom",
+      "Ravi Ensemble",
+      "Jamaican Heritage",
+      "Period Ensemble",
+      "Countryside Echoes",
+      "Blue Notes Trio",
+      "Space Travelers"
     ],
     "unique_artists": 20
   },
@@ -79,7 +79,7 @@
       "artist_familiarity": 0.52,
       "production_quality": 0.95,
       "added_score": 9.9,
-      "added_at": "2026-07-20T03:17:56.226047"
+      "added_at": "2026-07-20T03:33:00.429560"
     },
     {
       "id": 65,
@@ -98,7 +98,7 @@
       "artist_familiarity": 0.58,
       "production_quality": 0.94,
       "added_score": 9.8,
-      "added_at": "2026-07-20T03:17:56.226049"
+      "added_at": "2026-07-20T03:33:00.429561"
     },
     {
       "id": 13,
@@ -117,7 +117,7 @@
       "artist_familiarity": 0.6,
       "production_quality": 0.92,
       "added_score": 9.7,
-      "added_at": "2026-07-20T03:17:56.226050"
+      "added_at": "2026-07-20T03:33:00.429562"
     },
     {
       "id": 6,
@@ -136,7 +136,7 @@
       "artist_familiarity": 0.25,
       "production_quality": 0.72,
       "added_score": 9.6,
-      "added_at": "2026-07-20T03:17:56.226051"
+      "added_at": "2026-07-20T03:33:00.429563"
     },
     {
       "id": 45,
@@ -155,7 +155,7 @@
       "artist_familiarity": 0.28,
       "production_quality": 0.85,
       "added_score": 9.5,
-      "added_at": "2026-07-20T03:17:56.226052"
+      "added_at": "2026-07-20T03:33:00.429564"
     },
     {
       "id": 66,
@@ -174,7 +174,7 @@
       "artist_familiarity": 0.48,
       "production_quality": 0.96,
       "added_score": 9.4,
-      "added_at": "2026-07-20T03:17:56.226053"
+      "added_at": "2026-07-20T03:33:00.429565"
     },
     {
       "id": 20,
@@ -193,7 +193,7 @@
       "artist_familiarity": 0.28,
       "production_quality": 0.87,
       "added_score": 9.3,
-      "added_at": "2026-07-20T03:17:56.226054"
+      "added_at": "2026-07-20T03:33:00.429566"
     },
     {
       "id": 7,
@@ -212,7 +212,7 @@
       "artist_familiarity": 0.45,
       "production_quality": 0.88,
       "added_score": 9.2,
-      "added_at": "2026-07-20T03:17:56.226055"
+      "added_at": "2026-07-20T03:33:00.429567"
     },
     {
       "id": 19,
@@ -231,7 +231,7 @@
       "artist_familiarity": 0.35,
       "production_quality": 0.9,
       "added_score": 9.1,
-      "added_at": "2026-07-20T03:17:56.226056"
+      "added_at": "2026-07-20T03:33:00.429568"
     },
     {
       "id": 44,
@@ -250,7 +250,7 @@
       "artist_familiarity": 0.32,
       "production_quality": 0.78,
       "added_score": 9.0,
-      "added_at": "2026-07-20T03:17:56.226057"
+      "added_at": "2026-07-20T03:33:00.429570"
     },
     {
       "id": 4,
@@ -269,7 +269,7 @@
       "artist_familiarity": 0.35,
       "production_quality": 0.8,
       "added_score": 8.9,
-      "added_at": "2026-07-20T03:17:56.226058"
+      "added_at": "2026-07-20T03:33:00.429571"
     },
     {
       "id": 52,
@@ -288,7 +288,7 @@
       "artist_familiarity": 0.38,
       "production_quality": 0.89,
       "added_score": 8.8,
-      "added_at": "2026-07-20T03:17:56.226059"
+      "added_at": "2026-07-20T03:33:00.429572"
     },
     {
       "id": 37,
@@ -307,7 +307,7 @@
       "artist_familiarity": 0.42,
       "production_quality": 0.87,
       "added_score": 8.7,
-      "added_at": "2026-07-20T03:17:56.226061"
+      "added_at": "2026-07-20T03:33:00.429573"
     },
     {
       "id": 25,
@@ -326,7 +326,7 @@
       "artist_familiarity": 0.32,
       "production_quality": 0.82,
       "added_score": 8.6,
-      "added_at": "2026-07-20T03:17:56.226062"
+      "added_at": "2026-07-20T03:33:00.429574"
     },
     {
       "id": 51,
@@ -345,7 +345,7 @@
       "artist_familiarity": 0.42,
       "production_quality": 0.88,
       "added_score": 8.5,
-      "added_at": "2026-07-20T03:17:56.226063"
+      "added_at": "2026-07-20T03:33:00.429575"
     },
     {
       "id": 9,
@@ -364,7 +364,7 @@
       "artist_familiarity": 0.4,
       "production_quality": 0.77,
       "added_score": 8.4,
-      "added_at": "2026-07-20T03:17:56.226064"
+      "added_at": "2026-07-20T03:33:00.429576"
     },
     {
       "id": 16,
@@ -383,7 +383,7 @@
       "artist_familiarity": 0.38,
       "production_quality": 0.8,
       "added_score": 8.3,
-      "added_at": "2026-07-20T03:17:56.226065"
+      "added_at": "2026-07-20T03:33:00.429577"
     },
     {
       "id": 47,
@@ -402,7 +402,7 @@
       "artist_familiarity": 0.42,
       "production_quality": 0.86,
       "added_score": 8.2,
-      "added_at": "2026-07-20T03:17:56.226066"
+      "added_at": "2026-07-20T03:33:00.429578"
     },
     {
       "id": 12,
@@ -421,7 +421,7 @@
       "artist_familiarity": 0.5,
       "production_quality": 0.86,
       "added_score": 8.1,
-      "added_at": "2026-07-20T03:17:56.226067"
+      "added_at": "2026-07-20T03:33:00.429579"
     },
     {
       "id": 35,
@@ -440,7 +440,7 @@
       "artist_familiarity": 0.28,
       "production_quality": 0.88,
       "added_score": 8.0,
-      "added_at": "2026-07-20T03:17:56.226068"
+      "added_at": "2026-07-20T03:33:00.429580"
     }
   ]
 }

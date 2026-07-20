@@ -64,8 +64,17 @@ Moods like "peaceful" and "romantic" appear only once or twice in the dataset. I
 **Genre Matching is Binary**
 Synthwave gets zero credit for being like synth pop or electronic music, even though they sound similar. The system only gives points for exact genre matches, not close matches. This limits cross-genre discovery.
 
+**Diversity Penalty: Preventing Repetition**
+To prevent users from seeing multiple songs by the same artist or genre cluster, the system applies a diversity penalty:
+- First song by Artist X: No penalty
+- Second song by Artist X: -0.5 points (removed from top results if other options exist)
+- First song in Genre Y: No penalty
+- Second song in Genre Y: -0.2 points (discouraged but may appear if score is very high)
+
+**Example**: A lofi listener might see songs from three different lofi artists instead of the same artist repeated. This creates more varied playlists while respecting genre preferences.
+
 **Why This Matters**
-These biases aren't bugs—they're trade-offs. We made genre weight high on purpose to prevent rock songs from showing up in pop recommendations. But that same choice prevents a pop listener from discovering reggaeton or dance music (which have similar energy). You can't have both genre purity AND cross-genre discovery with just weights. 
+These biases aren't bugs—they're trade-offs. We made genre weight high on purpose to prevent rock songs from showing up in pop recommendations. But that same choice prevents a pop listener from discovering reggaeton or dance music (which have similar energy). You can't have both genre purity AND cross-genre discovery with just weights. The diversity penalty mitigates this by ensuring recommended songs come from different artists/genres when possible. 
 
 ---
 

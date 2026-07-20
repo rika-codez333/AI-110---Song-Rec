@@ -2,51 +2,51 @@
   "name": "Workout Mix",
   "theme": "workout",
   "description": "High-energy tracks for gym and cardio",
-  "created_at": "2026-07-20T03:17:56.225930",
+  "created_at": "2026-07-20T03:33:00.429471",
   "duration_minutes": 45.0,
   "song_count": 15,
   "stats": {
     "song_count": 15,
     "duration_minutes": 45.0,
     "genres": [
-      "house",
-      "trance",
-      "reggaeton",
-      "dubstep",
+      "dancehall",
       "techno",
+      "reggaeton",
       "electronic",
-      "pop",
-      "hip-hop",
-      "calypso",
-      "soca",
-      "punk",
+      "house",
       "Latin",
-      "dancehall"
+      "trance",
+      "hip-hop",
+      "dubstep",
+      "punk",
+      "pop",
+      "soca",
+      "calypso"
     ],
     "moods": [
-      "intense",
-      "energetic",
       "uplifting",
-      "joyful"
+      "intense",
+      "joyful",
+      "energetic"
     ],
     "avg_energy": 0.89,
     "avg_danceability": 0.87,
     "artists": [
-      "Carnival Vibes",
-      "Street Fighters",
+      "Calypso Kings",
+      "Berlin Underground",
+      "Synth Nexus",
+      "Max Pulse",
+      "Beat Masters",
+      "Synth Lords",
       "Rio Collective",
+      "Havana Nights",
+      "Wobble Kings",
+      "Street Fighters",
       "Euphoria Soundz",
       "Kingston Sound",
       "Summer Nights",
-      "Havana Nights",
-      "Calypso Kings",
-      "Beat Masters",
-      "Synth Nexus",
-      "Max Pulse",
-      "Berlin Underground",
-      "Synth Lords",
-      "Wobble Kings",
-      "DJ Impulse"
+      "DJ Impulse",
+      "Carnival Vibes"
     ],
     "unique_artists": 15
   },
@@ -68,7 +68,7 @@
       "artist_familiarity": 0.65,
       "production_quality": 0.81,
       "added_score": 9.9,
-      "added_at": "2026-07-20T03:17:56.225944"
+      "added_at": "2026-07-20T03:33:00.429481"
     },
     {
       "id": 21,
@@ -87,7 +87,7 @@
       "artist_familiarity": 0.62,
       "production_quality": 0.85,
       "added_score": 9.8,
-      "added_at": "2026-07-20T03:17:56.225948"
+      "added_at": "2026-07-20T03:33:00.429483"
     },
     {
       "id": 5,
@@ -106,7 +106,7 @@
       "artist_familiarity": 0.75,
       "production_quality": 0.85,
       "added_score": 9.7,
-      "added_at": "2026-07-20T03:17:56.225950"
+      "added_at": "2026-07-20T03:33:00.429485"
     },
     {
       "id": 43,
@@ -125,7 +125,7 @@
       "artist_familiarity": 0.7,
       "production_quality": 0.86,
       "added_score": 9.6,
-      "added_at": "2026-07-20T03:17:56.225952"
+      "added_at": "2026-07-20T03:33:00.429488"
     },
     {
       "id": 34,
@@ -144,7 +144,7 @@
       "artist_familiarity": 0.7,
       "production_quality": 0.83,
       "added_score": 9.5,
-      "added_at": "2026-07-20T03:17:56.225953"
+      "added_at": "2026-07-20T03:33:00.429490"
     },
     {
       "id": 64,
@@ -163,7 +163,7 @@
       "artist_familiarity": 0.74,
       "production_quality": 0.84,
       "added_score": 9.4,
-      "added_at": "2026-07-20T03:17:56.225954"
+      "added_at": "2026-07-20T03:33:00.429491"
     },
     {
       "id": 22,
@@ -182,7 +182,7 @@
       "artist_familiarity": 0.72,
       "production_quality": 0.83,
       "added_score": 9.3,
-      "added_at": "2026-07-20T03:17:56.225955"
+      "added_at": "2026-07-20T03:33:00.429492"
     },
     {
       "id": 41,
@@ -201,7 +201,7 @@
       "artist_familiarity": 0.68,
       "production_quality": 0.8,
       "added_score": 9.2,
-      "added_at": "2026-07-20T03:17:56.225956"
+      "added_at": "2026-07-20T03:33:00.429493"
     },
     {
       "id": 60,
@@ -220,7 +220,7 @@
       "artist_familiarity": 0.68,
       "production_quality": 0.81,
       "added_score": 9.1,
-      "added_at": "2026-07-20T03:17:56.225957"
+      "added_at": "2026-07-20T03:33:00.429494"
     },
     {
       "id": 31,
@@ -239,7 +239,7 @@
       "artist_familiarity": 0.69,
       "production_quality": 0.82,
       "added_score": 9.0,
-      "added_at": "2026-07-20T03:17:56.225958"
+      "added_at": "2026-07-20T03:33:00.429495"
     },
     {
       "id": 63,
@@ -258,7 +258,7 @@
       "artist_familiarity": 0.72,
       "production_quality": 0.83,
       "added_score": 8.9,
-      "added_at": "2026-07-20T03:17:56.225959"
+      "added_at": "2026-07-20T03:33:00.429496"
     },
     {
       "id": 11,
@@ -277,7 +277,7 @@
       "artist_familiarity": 0.52,
       "production_quality": 0.83,
       "added_score": 8.8,
-      "added_at": "2026-07-20T03:17:56.225961"
+      "added_at": "2026-07-20T03:33:00.429497"
     },
     {
       "id": 62,
@@ -296,7 +296,7 @@
       "artist_familiarity": 0.7,
       "production_quality": 0.82,
       "added_score": 8.7,
-      "added_at": "2026-07-20T03:17:56.225962"
+      "added_at": "2026-07-20T03:33:00.429498"
     },
     {
       "id": 55,
@@ -315,7 +315,7 @@
       "artist_familiarity": 0.5,
       "production_quality": 0.79,
       "added_score": 8.6,
-      "added_at": "2026-07-20T03:17:56.225963"
+      "added_at": "2026-07-20T03:33:00.429499"
     },
     {
       "id": 33,
@@ -334,7 +334,7 @@
       "artist_familiarity": 0.66,
       "production_quality": 0.8,
       "added_score": 8.5,
-      "added_at": "2026-07-20T03:17:56.225964"
+      "added_at": "2026-07-20T03:33:00.429500"
     }
   ]
 }

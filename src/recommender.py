@@ -454,7 +454,7 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
 
     return round(score, 3), reasons
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_param: float = 1.0, verbose: bool = False) -> List[Tuple[Dict, float, List[str]]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_param: float = 1.0, verbose: bool = False, strategy: Optional[ScoringStrategy] = None) -> List[Tuple[Dict, float, List[str]]]:
     """Rank songs by score and return top-k recommendations.
 
     Args:
@@ -463,17 +463,20 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_para
         k: Number of recommendations to return (default 5)
         tuning_param: Gaussian k parameter (0.5=loose, 1.0=standard, 2.0=strict, default 1.0)
         verbose: If True, logs detailed scoring for each song
+        strategy: Optional ScoringStrategy to use (defaults to BalancedStrategy)
 
     Returns:
         List of (song_dict, score, reasons) tuples, sorted by score descending
     """
     scored_songs = []
+    strategy_to_use = strategy or BalancedStrategy()
+    strategy_name = strategy_to_use.__class__.__name__
 
     if verbose:
-        logger.info(f"Recommending top-{k} songs for user with prefs: {user_prefs}")
+        logger.info(f"Recommending top-{k} songs for user with prefs: {user_prefs} | Strategy: {strategy_name}")
 
     for song in songs:
-        score, reasons = score_song(user_prefs, song, k=tuning_param, verbose=verbose)
+        score, reasons = strategy_to_use.score_song(user_prefs, song, k=tuning_param)
         scored_songs.append((song, score, reasons))
 
     ranked = sorted(scored_songs, key=lambda x: -x[1])
@@ -481,6 +484,6 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_para
     if verbose:
         logger.info(f"Top {k} recommendations:")
         for idx, (song, score, _) in enumerate(ranked[:k], 1):
-            logger.info(f"  {idx}. {song.get('title', 'Unknown')} - {score:.3f}/7.9")
+            logger.info(f"  {idx}. {song.get('title', 'Unknown')} - {score:.3f}/9.5")
 
     return ranked[:k]

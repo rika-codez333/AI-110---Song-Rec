@@ -24,7 +24,7 @@ def display_recommendations(recommendations, max_score=9.5):
     Display music recommendations in a clean, readable format.
 
     Args:
-        recommendations: List of tuples (song_dict, score, reasons_list)
+        recommendations: List of tuples (song_dict, score, reasons_list) or (song_dict, score, reasons_list, diversity_note)
         max_score: Maximum possible score (default 9.5)
     """
     if not recommendations:
@@ -38,7 +38,11 @@ def display_recommendations(recommendations, max_score=9.5):
 
     # Display each recommendation
     for idx, rec in enumerate(recommendations, 1):
-        song, score, explanation = rec
+        if len(rec) == 4:  # Includes diversity note
+            song, score, explanation, diversity_note = rec
+        else:
+            song, score, explanation = rec
+            diversity_note = ""
 
         # Song info with number
         artist = song.get('artist', 'Unknown Artist')
@@ -50,7 +54,7 @@ def display_recommendations(recommendations, max_score=9.5):
         bar_length = 30
         filled = int(bar_length * score_percentage / 100)
         bar = "█" * filled + "░" * (bar_length - filled)
-        print(f"   Score: {score:.2f}/{max_score} │{bar}│ {score_percentage:.0f}%")
+        print(f"   Score: {score:.2f}/{max_score} │{bar}│ {score_percentage:.0f}%{diversity_note}")
 
         # Reasons as formatted bullet points
         print("   Why you'll love it:")
@@ -132,12 +136,16 @@ def display_recommendations_table(recommendations, max_score=9.5):
         # Top reason for recommendation
         top_reason = explanation[0] if explanation else "No explanation"
 
+        # Append diversity note if present
+        if diversity_note:
+            top_reason += f" {diversity_note}"
+
         table_rows.append([
             idx,
             f"{title}\n({artist})",
             f"{score:.2f}/9.5\n({score_pct:.0f}%)",
             f"{genre}\n{mood}",
-            top_reason + diversity_note
+            top_reason
         ])
 
     # Print with aligned columns
@@ -232,20 +240,26 @@ def main() -> None:
         print(f"   Description: {description}")
         print(f"   Preferences: {prefs}")
 
-        # Show recommendations for the default Balanced strategy
+        # Show recommendations for the default Balanced strategy with diversity penalty
         recommendations = recommend_songs(prefs, songs, k=5)
-        display_recommendations(recommendations)
+        recommendations_with_penalty = apply_diversity_penalty(recommendations)
+        display_recommendations(recommendations_with_penalty)
 
         # Show a summary table (Challenge 4)
         print("\n📊 QUICK SUMMARY TABLE:")
-        display_recommendations_table(recommendations)
+        display_recommendations_table(recommendations_with_penalty)
 
         # Show an example with Energy-Focused strategy (Challenge 2)
         if profile_name == "High-Energy Pop":
-            print("\n🎵 ALTERNATIVE VIEW: Energy-Focused Strategy")
+            print("\n\n🎵 ALTERNATIVE VIEW: Energy-Focused Strategy")
             print("   (Prioritizes energy and danceability over genre)")
-            # Note: For this we'd need to enhance recommend_songs to accept strategy
-            print("   [See Challenge 2 implementation in recommender.py for strategy pattern]")
+            alt_strategy = EnergyFocusedStrategy()
+            alt_recommendations = recommend_songs(prefs, songs, k=5, strategy=alt_strategy)
+            alt_with_penalty = apply_diversity_penalty(alt_recommendations)
+            display_recommendations(alt_with_penalty)
+
+            print("\n📊 ENERGY-FOCUSED SUMMARY TABLE:")
+            display_recommendations_table(alt_with_penalty)
 
     # Demonstrate playlist creation (new feature)
     demonstrate_playlists(songs)
