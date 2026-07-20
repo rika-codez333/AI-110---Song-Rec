@@ -121,63 +121,73 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-### Example 1: High-Energy Workout User
+### Default User Profile: Happy Pop Listener (genre=pop, mood=happy, energy=0.8)
+
 ```
-User Profile: genre=pop, mood=intense, target_energy=0.93, likes_acoustic=False
+======================================================================
+🎵  TOP RECOMMENDATIONS (5 songs)
+======================================================================
 
-Top 5 Recommendations:
+1. Sunrise City - Neon Echo
+   Score: 6.93/7.8 │██████████████████████████░░░░│ 89%
+   Why you'll love it:
+     • 🎯 energy excellent match (0.82 ≈ 0.80)
+     • 🎯 danceability excellent match (0.79 ≈ 0.50)
+     • ✓ valence good match (0.84)
+     • 🎯 acousticness excellent match (0.18 ≈ 0.50)
+     • 🎭 mood matches (happy)
+     • 🎸 genre matches (pop)
 
-1. ⭐ Gym Hero by Max Pulse | Score: 1.000
-   🎯 energy excellent match (0.93 ≈ 0.93)
-   🎯 valence excellent match (0.77 ≈ 0.77)
-   🎸 genre matches (pop)
+----------------------------------------------------------------------
 
-2. Storm Runner by Voltline | Score: 0.824
-   🎯 energy excellent match (0.91 ≈ 0.93)
-   ✓ danceability good match (0.66)
+2. Gym Hero - Max Pulse
+   Score: 5.83/7.8 │██████████████████████░░░░░░░░│ 75%
+   Why you'll love it:
+     • 🎯 energy excellent match (0.93 ≈ 0.80)
+     • ✓ danceability good match (0.88)
+     • 🎯 valence excellent match (0.77 ≈ 0.50)
+     • ✓ acousticness good match (0.05)
+     • 🎸 genre matches (pop)
 
-3. Sunrise City by Neon Echo | Score: 0.744
-   🎯 energy excellent match (0.82 ≈ 0.93)
-   🎯 valence excellent match (0.84 ≈ 0.77)
+----------------------------------------------------------------------
 
-4. Rooftop Lights by Indigo Parade | Score: 0.688
-   ✓ energy good match (0.76)
-   🎯 valence excellent match (0.81 ≈ 0.77)
+3. Rooftop Lights - Indigo Parade
+   Score: 4.98/7.8 │███████████████████░░░░░░░░░░░│ 64%
+   Why you'll love it:
+     • 🎯 energy excellent match (0.76 ≈ 0.80)
+     • 🎯 danceability excellent match (0.82 ≈ 0.50)
+     • 🎯 valence excellent match (0.81 ≈ 0.50)
+     • 🎯 acousticness excellent match (0.35 ≈ 0.50)
+     • 🎭 mood matches (happy)
 
-5. Night Drive Loop by Neon Echo | Score: 0.671
-   ✓ energy good match (0.75)
-   ✓ danceability good match (0.73)
+----------------------------------------------------------------------
+
+4. Night Drive Loop - Neon Echo
+   Score: 4.09/7.8 │███████████████░░░░░░░░░░░░░░░│ 52%
+   Why you'll love it:
+     • 🎯 energy excellent match (0.75 ≈ 0.80)
+     • 🎯 danceability excellent match (0.73 ≈ 0.50)
+     • 🎯 valence excellent match (0.49 ≈ 0.50)
+     • 🎯 acousticness excellent match (0.22 ≈ 0.50)
+
+----------------------------------------------------------------------
+
+5. Jazz Blue - New York Trio
+   Score: 4.07/7.8 │███████████████░░░░░░░░░░░░░░░│ 52%
+   Why you'll love it:
+     • 🎯 energy excellent match (0.52 ≈ 0.80)
+     • 🎯 danceability excellent match (0.58 ≈ 0.50)
+     • 🎯 valence excellent match (0.48 ≈ 0.50)
+     • 🎯 acousticness excellent match (0.68 ≈ 0.50)
+
+======================================================================
 ```
 
-### Example 2: Chill Study User
-```
-User Profile: genre=lofi, mood=chill, target_energy=0.35, likes_acoustic=True
-
-Top 5 Recommendations:
-
-1. ⭐ Library Rain by Paper Lanterns | Score: 1.000
-   🎯 energy excellent match (0.35 ≈ 0.35)
-   🎸 genre matches (lofi)
-   🎭 mood matches (chill)
-
-2. Midnight Coding by LoRoom | Score: 0.897
-   🎯 energy excellent match (0.42 ≈ 0.35)
-   🎸 genre matches (lofi)
-
-3. Spacewalk Thoughts by Orbit Bloom | Score: 0.842
-   🎯 energy excellent match (0.28 ≈ 0.35)
-   ✓ acousticness good match (0.92)
-
-4. Focus Flow by LoRoom | Score: 0.749
-   🎯 energy excellent match (0.40 ≈ 0.35)
-   🎸 genre matches (lofi)
-
-5. Coffee Shop Stories by Slow Stereo | Score: 0.697
-   ✓ energy good match (0.37)
-   ✓ acousticness good match (0.89)
-```
-
-**Key Observation**: The recommender learns that "musical vibe" emerges from audio features (energy, valence, danceability) more than categorical labels, allowing cross-genre recommendations when the emotional tone matches.
+**Key Observations**:
+- **#1 "Sunrise City"** wins with both genre and mood exact matches plus excellent energy/danceability alignment
+- **#2 "Gym Hero"** ranks second with pop genre match and high energy (0.93), even though mood doesn't match
+- **#3 "Rooftop Lights"** includes a mood match (happy) and strong feature alignment despite indie pop genre not matching
+- The system successfully balances categorical matches (genre, mood) with continuous feature proximity (energy, valence, danceability)
 
 ---
 
