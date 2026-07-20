@@ -146,9 +146,7 @@ class Recommender:
         return explanation
 
 def load_songs(csv_path: str) -> List[Dict]:
-    """
-    Loads songs from a CSV file and returns list of song dicts.
-    """
+    """Parse songs from CSV into a list of dictionaries."""
     songs = []
     with open(csv_path, 'r') as f:
         reader = csv.DictReader(f)
@@ -169,8 +167,7 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = False) -> Tuple[float, List[str]]:
-    """
-    Scores a single song against user preferences using proximity-based Gaussian similarity.
+    """Score a song against user preferences using proximity-based Gaussian similarity.
 
     Option D Recipe: Balanced discovery with exact-match priority
     - Genre match: +2.0 | Mood match: +1.0
@@ -256,8 +253,7 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
     return round(score, 3), reasons
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_param: float = 1.0, verbose: bool = False) -> List[Tuple[Dict, float, List[str]]]:
-    """
-    Ranks all songs by score and returns top-k recommendations.
+    """Rank songs by score and return top-k recommendations.
 
     Args:
         user_prefs: User preference profile (e.g., favorite song or UserProfile as dict)
