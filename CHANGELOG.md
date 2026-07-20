@@ -791,3 +791,113 @@ No further optimization needed. The system is operating at the intended specific
 
 **Last Updated**: 2026-07-20  
 **Status**: Phase 8 complete, sensitivity testing confirms weight validation, no changes committed, system operating at optimal specification
+
+---
+
+## Phase 9: Model Card & Documentation Completion ✅
+
+### Objective:
+Formalize system understanding and limitations by creating comprehensive documentation in `model_card.md`. Analyze discovered biases from sensitivity testing and evaluation, then document findings with evidence from experiments.
+
+### Deliverables Completed:
+
+#### 1. **Model Card Sections** (8 sections total)
+- **Model Name**: SoundMatcher 1.0
+- **Intended Use**: Classroom exploration; not production
+- **How It Works**: Explanation of categorical + proximity scoring, Gaussian formula, max score calculation
+- **Data**: 31 songs, 25 genres, 15 moods, sparse distribution analysis
+- **Strengths**: 5 validated strengths (genre matching 80%, audio nuance, transparency, explainability, contradiction handling)
+- **Limitations & Bias**: 3 major biases identified with quantified evidence
+- **Evaluation**: Detailed profile testing with profile-pair comparisons
+- **Future Work**: 6 medium/high-impact enhancements
+- **Personal Reflection**: Key learnings on trade-offs and complexity
+
+#### 2. **Bias Analysis** (3 biases discovered & documented)
+
+**Bias 1: Genre Filter Bubble**
+- **Evidence**: Lofi listener sees only 3 lofi songs (5.68–5.70) with 60% gap to nearest non-lofi alternative (3.43)
+- **Root Cause**: Genre weight (2.3) + small dataset (1–3 songs per genre)
+- **Validation**: Sensitivity testing showed that halving genre weight (2.3→1.15) reintroduced cross-genre contamination
+- **Impact**: Users locked into preferred genre; zero serendipity
+- **Reference**: data/songs.csv genre distribution, src/recommender.py weight logic
+
+**Bias 2: Niche Mood Under-Representation**
+- **Evidence**: "peaceful", "romantic", "inspiring" appear only 1–2× in dataset
+- **Root Cause**: Small dataset; mood penalties only apply to exact mismatches
+- **Impact**: Users requesting rare moods receive no explicit feedback; system silently degrades
+- **Reference**: data/songs.csv mood value counts
+
+**Bias 3: Categorical Hard Matching**
+- **Evidence**: Synthwave gets 0 credit for synth pop, electronic, darkwave (acoustically similar genres)
+- **Root Cause**: Binary genre matching (exact match = +2.3, no match = 0.0)
+- **Impact**: Limits cross-genre discovery and semantic understanding
+- **Recommendation**: Future work to add embedding-based genre similarity
+
+#### 3. **Profile-Specific Evaluation** (3 standard + insights from 4 adversarial)
+
+**Standard Profiles Tested**:
+- High-Energy Pop (0.9 energy, happy mood, pop genre) → Top 5: Sunrise City, Gym Hero, Rooftop Lights, Storm Runner, Night Drive Loop
+- Chill Lofi (0.2 energy, calm mood, lofi genre) → Top 5: Library Rain, Focus Flow, Midnight Coding, Whispers in the Rain, Spacewalk Thoughts
+- Deep Intense Rock (0.85 energy, intense mood, rock genre) → Top 5: Storm Runner, Dancehall Energy, Neon Mambo, Bass Drop Thunder, Gym Hero
+
+**Profile-to-Profile Comparisons** (3 pairs):
+1. **Pop vs. Lofi**: Energy determines everything; Gym Hero #2 for pop (5.46) but not top-5 for lofi (0.93 vs 0.2 energy mismatch)
+2. **Pop vs. Rock**: Mood is secondary to genre; genre weight (2.3) > mood match (1.0) causes rock song disappearance in pop context
+3. **Lofi vs. Rock**: Incompatible audio spaces (energy 0.28–0.42 vs 0.85–0.91); zero top-3 overlap expected and confirmed
+
+#### 4. **"Gym Hero Problem" Explained**
+Plain-language explanation using shoe-shopping analogy:
+- User wants: shoes (genre), happy color (mood), high performance (energy 0.9)
+- Gym Hero offers: shoes (+2.3), intense color (-0.5), very high performance (+1.2)
+- Result: "85% of what you asked for" = scores 5.46/7.9, ranks #2
+- Key insight: Transparent trade-offs make non-intuitive results acceptable to users
+
+#### 5. **Metrics & Surprises Documented**
+
+**Metrics Tracked**:
+- Genre coherence in top-5: 80% post-optimization (vs 60% pre-optimization)
+- Score clustering: Lofi tight (5.68–5.70); rock spread (4.65–7.18)
+- Cross-genre discovery gap: Non-preferred genres score 60–70% lower
+- Energy sensitivity: 0.4+ point mismatches reduce scores by 1.0+ point
+
+**Key Surprises**:
+1. Filter bubble discovery: Pre-optimization Storm Runner at 4.08 (52%) in pop; post-optimization 3.38 (43%)
+2. Energy dominance validation: Doubling energy weight brought Storm Runner back to 4.58 (61%), proving the problem is real
+3. Mood penalties critical: -0.5 for mismatch reduced storm runner by 18%; without penalty would be 5.08
+4. Genre lock-in unavoidable: With only 1–3 songs per genre, strong genre preference is necessary, not arbitrary
+
+### Files Modified:
+- **model_card.md** (newly created/expanded): Sections 1–9 complete with bias analysis, evaluation, surprises, metrics
+
+### Testing Performed:
+- ✅ All 3 standard profiles evaluated with top-5 results
+- ✅ All 4 adversarial profiles tested (from Phase 8 sensitivity testing)
+- ✅ Profile-pair comparisons written for 3 key contrasts
+- ✅ Mathematical validation of "Gym Hero Problem" scoring breakdown
+- ✅ Evidence-based bias documentation with references to code/data
+
+### Key Takeaways:
+1. **Trade-offs are real**: Can't solve both genre coherence AND cross-genre discovery with weights alone
+2. **Transparency is key**: Users accept non-intuitive recommendations if reasons are clear
+3. **Small datasets reveal biases under adversarial testing, not standard use**
+4. **Recommender systems are inherently opinionated**: Every design choice (weight, penalty, feature) creates a bias
+
+### Validation Method:
+- Used sensitivity testing (Phase 8) to validate that Option C weights are necessary, not arbitrary
+- Backed bias claims with quantified evidence (scores, percentages, profile comparisons)
+- Explained surprises by connecting them to algorithm design choices
+- Used plain language to make technical findings accessible
+
+### Next Steps (Optional):
+No further work required. System is fully documented and analyzed. Future enhancements remain at "Future Work" level in model_card.md:
+- Dataset expansion (31 → 100+ songs per genre)
+- Semantic genre similarity (embeddings)
+- Mood embeddings ("reflective" ≈ "calm")
+- Diversity-aware ranking
+- Collaborative filtering signals
+- A/B testing with real users
+
+---
+
+**Last Updated**: 2026-07-20  
+**Status**: Phase 9 complete, model card fully documented with bias analysis and detailed evaluation, system fully understood and ready for feedback/iteration
