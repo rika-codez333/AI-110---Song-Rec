@@ -794,6 +794,3 @@ Read the [**Model Card**](model_card.md) for a full analysis of system behavior,
 **What I'd Try Next**: (1) **Semantic genre similarity** using embeddings—so synthwave gets partial credit for being similar to synth pop. Right now, genre matching is all-or-nothing, which locks users into one sound. (2) **Mood embeddings** to handle "reflective" ≈ "calm"—I noticed rare moods disappear entirely because users can't describe them precisely. (3) **Behavioral signals** like skip rates—the system right now only knows what users say they like, not what they actually play. A third experiment would be A/B testing with real users to see if the mood penalty (−0.5) actually makes recommendations feel better, or if it just manipulates the math. The biggest risk in building recommenders is that you optimize for metrics (genre coherence, score diversity) that don't match what users actually want.
 
 ---
-
-
-

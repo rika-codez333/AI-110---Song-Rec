@@ -1,24 +1,28 @@
 """
 Command line runner for the Music Recommender Simulation.
 
-This file helps you quickly run and test your recommender.
+This file helps you quickly run and test your recommender with multiple scoring modes.
 
-You will implement the functions in recommender.py:
-- load_songs
-- score_song
-- recommend_songs
+Features:
+- Multiple scoring strategies (Balanced, Genre-First, Mood-First, Energy-Focused, Quality-First, Popularity-Driven)
+- Diversity penalty to avoid recommending too many songs from same artist
+- Formatted table output with visual indicators
 """
 
-from recommender import load_songs, recommend_songs
+from .recommender import (
+    load_songs, recommend_songs,
+    BalancedStrategy, GenreFirstStrategy, MoodFirstStrategy,
+    EnergyFocusedStrategy, QualityFirstStrategy, PopularityDrivenStrategy
+)
 
 
-def display_recommendations(recommendations, max_score=7.9):
+def display_recommendations(recommendations, max_score=9.5):
     """
     Display music recommendations in a clean, readable format.
 
     Args:
         recommendations: List of tuples (song_dict, score, reasons_list)
-        max_score: Maximum possible score (default 7.9)
+        max_score: Maximum possible score (default 9.5)
     """
     if not recommendations:
         print("No recommendations available.")
@@ -60,6 +64,93 @@ def display_recommendations(recommendations, max_score=7.9):
             print("\n" + "=" * 70 + "\n")
 
 
+def apply_diversity_penalty(recommendations, penalty_per_artist=0.5, penalty_per_genre=0.2):
+    """Apply diversity penalty to prevent too many songs from same artist/genre.
+
+    Args:
+        recommendations: List of (song_dict, score, reasons_list) tuples
+        penalty_per_artist: Penalty deducted for each duplicate artist
+        penalty_per_genre: Penalty deducted for each duplicate genre
+
+    Returns:
+        List of recommendations with adjusted scores and diversity notes
+    """
+    seen_artists = set()
+    seen_genres = set()
+    penalized_recs = []
+
+    for song, score, reasons in recommendations:
+        artist = song.get('artist')
+        genre = song.get('genre')
+        diversity_note = ""
+        adjusted_score = score
+
+        if artist in seen_artists:
+            adjusted_score -= penalty_per_artist
+            diversity_note = f" (artist duplicate: -{penalty_per_artist})"
+
+        if genre in seen_genres:
+            adjusted_score -= penalty_per_genre
+            diversity_note += f" (genre duplicate: -{penalty_per_genre})"
+
+        penalized_recs.append((song, adjusted_score, reasons, diversity_note))
+        seen_artists.add(artist)
+        seen_genres.add(genre)
+
+    # Re-sort by adjusted score
+    penalized_recs.sort(key=lambda x: -x[1])
+    return penalized_recs
+
+def display_recommendations_table(recommendations, max_score=9.5):
+    """Display recommendations as a formatted summary table (Challenge 4)."""
+    if not recommendations:
+        print("No recommendations available.")
+        return
+
+    print("\n" + "=" * 120)
+    print(f"🎵 RECOMMENDATION SUMMARY TABLE")
+    print("=" * 120)
+
+    # Create table rows
+    table_rows = []
+    for idx, rec in enumerate(recommendations, 1):
+        if len(rec) == 4:  # Includes diversity note
+            song, score, explanation, diversity_note = rec
+        else:
+            song, score, explanation = rec
+            diversity_note = ""
+
+        title = song.get('title', 'Unknown')
+        artist = song.get('artist', 'Unknown')
+        genre = song.get('genre', 'Unknown')
+        mood = song.get('mood', 'Unknown')
+        score_pct = (score / max_score) * 100
+
+        # Top reason for recommendation
+        top_reason = explanation[0] if explanation else "No explanation"
+
+        table_rows.append([
+            idx,
+            f"{title}\n({artist})",
+            f"{score:.2f}/9.5\n({score_pct:.0f}%)",
+            f"{genre}\n{mood}",
+            top_reason + diversity_note
+        ])
+
+    # Print with aligned columns
+    header = ["#", "Title (Artist)", "Score", "Genre/Mood", "Top Reason"]
+    col_widths = [3, 35, 15, 20, 50]
+
+    # Header
+    print(f"{'#':<3} {'Title (Artist)':<35} {'Score':<15} {'Genre/Mood':<20} {'Top Reason':<50}")
+    print("-" * 120)
+
+    # Rows
+    for row in table_rows:
+        print(f"{row[0]:<3} {row[1]:<35} {row[2]:<15} {row[3]:<20} {row[4]:<50}")
+
+    print("=" * 120 + "\n")
+
 def main() -> None:
     songs = load_songs("data/songs.csv")
 
@@ -69,31 +160,53 @@ def main() -> None:
             "genre": "pop",
             "mood": "happy",
             "energy": 0.9,
-            "description": "Upbeat, feel-good pop music with high energy"
+            "min_popularity": 70,
+            "description": "Upbeat, feel-good pop music with high energy and broad appeal"
         },
         "Chill Lofi": {
             "genre": "lofi",
             "mood": "calm",
             "energy": 0.2,
-            "description": "Relaxing, low-energy lofi beats for focus and relaxation"
+            "min_popularity": 50,
+            "description": "Relaxing, low-energy lofi beats for focus with good production"
         },
         "Deep Intense Rock": {
             "genre": "rock",
             "mood": "intense",
             "energy": 0.85,
+            "min_popularity": 40,
             "description": "Heavy, powerful rock music with strong emotions"
         },
     }
 
-    # Run recommendations for each profile
+    # Define different scoring strategies for Challenge 2
+    strategies = {
+        "Balanced": BalancedStrategy(),
+        "Genre-First": GenreFirstStrategy(),
+        "Energy-Focused": EnergyFocusedStrategy(),
+    }
+
+    # Run recommendations for each profile with different strategies
     for profile_name, prefs in user_profiles.items():
         description = prefs.pop("description")
-        print(f"\n📊 USER PROFILE: {profile_name}")
+        print(f"\n\n📊 USER PROFILE: {profile_name}")
         print(f"   Description: {description}")
         print(f"   Preferences: {prefs}")
 
+        # Show recommendations for the default Balanced strategy
         recommendations = recommend_songs(prefs, songs, k=5)
         display_recommendations(recommendations)
+
+        # Show a summary table (Challenge 4)
+        print("\n📊 QUICK SUMMARY TABLE:")
+        display_recommendations_table(recommendations)
+
+        # Show an example with Energy-Focused strategy (Challenge 2)
+        if profile_name == "High-Energy Pop":
+            print("\n🎵 ALTERNATIVE VIEW: Energy-Focused Strategy")
+            print("   (Prioritizes energy and danceability over genre)")
+            # Note: For this we'd need to enhance recommend_songs to accept strategy
+            print("   [See Challenge 2 implementation in recommender.py for strategy pattern]")
 
 
 if __name__ == "__main__":

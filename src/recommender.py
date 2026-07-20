@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
+from abc import ABC, abstractmethod
 import math
 import csv
 import logging
@@ -26,6 +27,11 @@ class Song:
     valence: float
     danceability: float
     acousticness: float
+    popularity: float
+    release_decade: str
+    mood_tags: str
+    artist_familiarity: float
+    production_quality: float
 
 @dataclass
 class UserProfile:
@@ -40,16 +46,163 @@ class UserProfile:
     preferred_danceability: float
     preferred_tempo_bpm: float
     preferred_acousticness: float
+    min_popularity: float = 30.0
+    preferred_production_quality: float = 0.75
+    prefer_artist_familiarity: bool = True
+
+class ScoringStrategy(ABC):
+    """Base class for different recommendation scoring strategies (Strategy Pattern)."""
+
+    @abstractmethod
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Score a song based on the strategy's weighting."""
+        pass
+
+class BalancedStrategy(ScoringStrategy):
+    """Default balanced strategy: equal weight across all features."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Balanced scoring across all attributes."""
+        weights = {
+            'genre': 2.3, 'mood': 1.0, 'mood_mismatch': -0.5,
+            'energy': 1.2, 'danceability': 1.2, 'valence': 1.0,
+            'tempo_bpm': 0.6, 'acousticness': 0.6,
+            'popularity': 0.8, 'production_quality': 0.6, 'artist_familiarity': 0.4,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+class GenreFirstStrategy(ScoringStrategy):
+    """Genre-first: heavily weights genre matching."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Genre-first scoring: genre weight doubled."""
+        weights = {
+            'genre': 4.0, 'mood': 0.8, 'mood_mismatch': -0.3,
+            'energy': 0.8, 'danceability': 0.8, 'valence': 0.6,
+            'tempo_bpm': 0.4, 'acousticness': 0.4,
+            'popularity': 0.4, 'production_quality': 0.3, 'artist_familiarity': 0.2,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+class MoodFirstStrategy(ScoringStrategy):
+    """Mood-first: prioritizes mood matching and emotional alignment."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Mood-first scoring: mood weight tripled, valence boosted."""
+        weights = {
+            'genre': 1.0, 'mood': 2.5, 'mood_mismatch': -1.0,
+            'energy': 1.5, 'danceability': 1.0, 'valence': 1.8,
+            'tempo_bpm': 0.7, 'acousticness': 0.6,
+            'popularity': 0.5, 'production_quality': 0.5, 'artist_familiarity': 0.3,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+class EnergyFocusedStrategy(ScoringStrategy):
+    """Energy-focused: emphasizes energy and danceability for workout/party playlists."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Energy-focused scoring: energy and danceability doubled."""
+        weights = {
+            'genre': 1.0, 'mood': 0.6, 'mood_mismatch': -0.2,
+            'energy': 2.5, 'danceability': 2.5, 'valence': 1.5,
+            'tempo_bpm': 1.2, 'acousticness': 0.3,
+            'popularity': 0.6, 'production_quality': 0.4, 'artist_familiarity': 0.3,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+class QualityFirstStrategy(ScoringStrategy):
+    """Quality-first: prioritizes production quality and artistry."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Quality-first scoring: production quality and artist familiarity boosted."""
+        weights = {
+            'genre': 1.5, 'mood': 1.2, 'mood_mismatch': -0.4,
+            'energy': 0.8, 'danceability': 0.8, 'valence': 0.8,
+            'tempo_bpm': 0.6, 'acousticness': 0.8,
+            'popularity': 1.0, 'production_quality': 1.8, 'artist_familiarity': 1.2,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+class PopularityDrivenStrategy(ScoringStrategy):
+    """Popularity-driven: favors well-known songs and artists."""
+
+    def score_song(self, user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+        """Popularity-driven scoring: popularity and artist familiarity doubled."""
+        weights = {
+            'genre': 1.2, 'mood': 0.8, 'mood_mismatch': -0.3,
+            'energy': 1.0, 'danceability': 1.0, 'valence': 0.8,
+            'tempo_bpm': 0.5, 'acousticness': 0.4,
+            'popularity': 2.0, 'production_quality': 0.8, 'artist_familiarity': 1.5,
+        }
+        return _compute_score(user_prefs, song, weights, k)
+
+def _compute_score(user_prefs: Dict, song: Dict, weights: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+    """Internal helper to compute score with given weights."""
+    score = 0.0
+    reasons = []
+    contributions = {}
+
+    numerical_features = ['energy', 'danceability', 'valence', 'tempo_bpm', 'acousticness', 'production_quality', 'artist_familiarity']
+    for feature in numerical_features:
+        pref_val = user_prefs.get(feature, 0.5)
+        song_val = song.get(feature, 0.5)
+        distance_squared = (pref_val - song_val) ** 2
+        similarity = math.exp(-k * distance_squared)
+        contribution = weights[feature] * similarity
+        score += contribution
+        contributions[feature] = (contribution, similarity, song_val, pref_val)
+
+        if similarity > 0.9:
+            reasons.append(f"🎯 {feature} excellent match ({song_val:.2f} ≈ {pref_val:.2f})")
+        elif similarity > 0.7:
+            reasons.append(f"✓ {feature} good match ({song_val:.2f})")
+
+    mood_match = song['mood'] == user_prefs.get('mood')
+    genre_match = song['genre'] == user_prefs.get('genre')
+
+    if mood_match:
+        score += weights['mood']
+        contributions['mood'] = (weights['mood'], 1.0, song['mood'], user_prefs.get('mood'))
+        reasons.append(f"🎭 mood matches ({song['mood']})")
+    else:
+        mood_penalty = weights['mood_mismatch']
+        score += mood_penalty
+        contributions['mood'] = (mood_penalty, 0.0, song['mood'], user_prefs.get('mood'))
+        reasons.append(f"⚠️ mood mismatch ({song['mood']} ≠ {user_prefs.get('mood')})")
+
+    if genre_match:
+        score += weights['genre']
+        contributions['genre'] = (weights['genre'], 1.0, song['genre'], user_prefs.get('genre'))
+        reasons.append(f"🎸 genre matches ({song['genre']})")
+    else:
+        contributions['genre'] = (0.0, 0.0, song['genre'], user_prefs.get('genre'))
+
+    min_popularity = user_prefs.get('min_popularity', 30.0)
+    song_popularity = song.get('popularity', 50.0) / 100.0
+    if song.get('popularity', 50.0) >= min_popularity:
+        pop_similarity = min(1.0, song_popularity * 1.2)
+        pop_contribution = weights['popularity'] * pop_similarity
+        score += pop_contribution
+        contributions['popularity'] = (pop_contribution, pop_similarity, song.get('popularity', 50.0), min_popularity)
+        if pop_similarity > 0.8:
+            reasons.append(f"⭐ popularity strong ({song.get('popularity', 50.0):.0f}/100)")
+    else:
+        score -= 0.3
+        contributions['popularity'] = (-0.3, 0.0, song.get('popularity', 50.0), min_popularity)
+
+    return round(score, 3), reasons
 
 class Recommender:
     """
     OOP implementation of the recommendation logic.
     Required by tests/test_recommender.py
+    Supports Strategy pattern for different scoring modes.
     """
-    def __init__(self, songs: List[Song]):
+    def __init__(self, songs: List[Song], strategy: Optional[ScoringStrategy] = None):
         self.songs = songs
+        self.strategy = strategy or BalancedStrategy()
 
-    def recommend(self, user: UserProfile, k: int = 5, tuning_param: float = 1.0, verbose: bool = False) -> List[Song]:
+    def recommend(self, user: UserProfile, k: int = 5, tuning_param: float = 1.0, verbose: bool = False, strategy: Optional[ScoringStrategy] = None) -> List[Song]:
         """
         Recommends top-k songs based on user profile using proximity-based content filtering.
 
@@ -58,6 +211,7 @@ class Recommender:
             k: Number of recommendations (default 5)
             tuning_param: Gaussian k parameter (0.5=loose, 1.0=standard, 2.0=strict)
             verbose: If True, logs detailed scoring breakdown
+            strategy: Optional ScoringStrategy to override instance strategy
 
         Returns:
             List of top-k Song objects, ranked by score
@@ -70,10 +224,16 @@ class Recommender:
             'danceability': user.preferred_danceability,
             'tempo_bpm': user.preferred_tempo_bpm,
             'acousticness': user.preferred_acousticness,
+            'min_popularity': user.min_popularity,
+            'production_quality': user.preferred_production_quality,
+            'artist_familiarity': user.prefer_artist_familiarity and 0.7 or 0.3,
         }
 
+        strategy_to_use = strategy or self.strategy
+        strategy_name = strategy_to_use.__class__.__name__
+
         if verbose:
-            logger.info(f"Recommending top-{k} songs | User: genre={user.favorite_genre}, mood={user.favorite_mood}, energy={user.target_energy}")
+            logger.info(f"Recommending top-{k} songs | User: genre={user.favorite_genre}, mood={user.favorite_mood}, energy={user.target_energy} | Strategy: {strategy_name}")
 
         scored_songs = []
         for song in self.songs:
@@ -88,8 +248,13 @@ class Recommender:
                 'valence': song.valence,
                 'danceability': song.danceability,
                 'acousticness': song.acousticness,
+                'popularity': song.popularity,
+                'release_decade': song.release_decade,
+                'mood_tags': song.mood_tags,
+                'artist_familiarity': song.artist_familiarity,
+                'production_quality': song.production_quality,
             }
-            score, _ = score_song(user_prefs, song_dict, k=tuning_param, verbose=verbose)
+            score, _ = strategy_to_use.score_song(user_prefs, song_dict, k=tuning_param)
             scored_songs.append((song, score))
 
         ranked = sorted(scored_songs, key=lambda x: -x[1])
@@ -101,7 +266,7 @@ class Recommender:
 
         return [song for song, _ in ranked[:k]]
 
-    def explain_recommendation(self, user: UserProfile, song: Song, tuning_param: float = 1.0, verbose: bool = False) -> str:
+    def explain_recommendation(self, user: UserProfile, song: Song, tuning_param: float = 1.0, verbose: bool = False, strategy: Optional[ScoringStrategy] = None) -> str:
         """
         Explains why a song was recommended to a user.
 
@@ -110,6 +275,7 @@ class Recommender:
             song: Song to explain
             tuning_param: Gaussian k parameter
             verbose: If True, logs the explanation
+            strategy: Optional ScoringStrategy to override instance strategy
 
         Returns:
             String explanation with score and contributing factors
@@ -122,6 +288,9 @@ class Recommender:
             'danceability': user.preferred_danceability,
             'tempo_bpm': user.preferred_tempo_bpm,
             'acousticness': user.preferred_acousticness,
+            'min_popularity': user.min_popularity,
+            'production_quality': user.preferred_production_quality,
+            'artist_familiarity': user.prefer_artist_familiarity and 0.7 or 0.3,
         }
 
         song_dict = {
@@ -135,10 +304,16 @@ class Recommender:
             'valence': song.valence,
             'danceability': song.danceability,
             'acousticness': song.acousticness,
+            'popularity': song.popularity,
+            'release_decade': song.release_decade,
+            'mood_tags': song.mood_tags,
+            'artist_familiarity': song.artist_familiarity,
+            'production_quality': song.production_quality,
         }
 
-        score, reasons = score_song(user_prefs, song_dict, k=tuning_param, verbose=verbose)
-        explanation = f"Score: {score:.3f}/7.9\n" + "\n".join(reasons)
+        strategy_to_use = strategy or self.strategy
+        score, reasons = strategy_to_use.score_song(user_prefs, song_dict, k=tuning_param)
+        explanation = f"Score: {score:.3f}/9.5\n" + "\n".join(reasons)
 
         if verbose:
             logger.info(f"Explaining '{song.title}': {explanation.replace(chr(10), ' | ')}")
@@ -162,6 +337,11 @@ def load_songs(csv_path: str) -> List[Dict]:
                 'valence': float(row['valence']),
                 'danceability': float(row['danceability']),
                 'acousticness': float(row['acousticness']),
+                'popularity': float(row['popularity']),
+                'release_decade': row['release_decade'],
+                'mood_tags': row['mood_tags'],
+                'artist_familiarity': float(row['artist_familiarity']),
+                'production_quality': float(row['production_quality']),
             }
             songs.append(song)
     return songs
@@ -169,11 +349,12 @@ def load_songs(csv_path: str) -> List[Dict]:
 def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = False) -> Tuple[float, List[str]]:
     """Score a song against user preferences using proximity-based Gaussian similarity.
 
-    Option C Recipe: Balanced approach with improved genre coherence
-    - Genre match: +2.3 (improved) | Mood match: +1.0 | Mood mismatch: -0.5 (NEW)
-    - Energy: +1.2 (reduced) | Danceability: +1.2 | Valence: +1.0
+    Enhanced weights with new attributes:
+    - Genre match: +2.3 | Mood match: +1.0 | Mood mismatch: -0.5
+    - Energy: +1.2 | Danceability: +1.2 | Valence: +1.0
     - Tempo: +0.6 | Acousticness: +0.6
-    - Max score: ~7.9
+    - Popularity: +0.8 | Production Quality: +0.6 | Artist Familiarity: +0.4
+    - Max score: ~9.5
 
     Args:
         user_prefs: Reference song preferences (e.g., user's liked song or target profile)
@@ -182,9 +363,9 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
         verbose: If True, logs detailed scoring breakdown for this song
 
     Returns:
-        (score, reasons): Score (0-7.9 max) and list of contributing factors
+        (score, reasons): Score (0-9.5 max) and list of contributing factors
     """
-    # Option C: Improved weights with mood penalty for better genre coherence
+    # Enhanced weights with new attributes
     weights = {
         'genre': 2.3,
         'mood': 1.0,
@@ -194,6 +375,9 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
         'valence': 1.0,
         'tempo_bpm': 0.6,
         'acousticness': 0.6,
+        'popularity': 0.8,
+        'production_quality': 0.6,
+        'artist_familiarity': 0.4,
     }
 
     score = 0.0
@@ -204,7 +388,7 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
         logger.info(f"Scoring '{song.get('title', 'Unknown')}' | k={k} (tuning: 0.5=loose, 1.0=standard, 2.0=strict)")
 
     # Numerical features: Gaussian similarity (proximity-based)
-    numerical_features = ['energy', 'danceability', 'valence', 'tempo_bpm', 'acousticness']
+    numerical_features = ['energy', 'danceability', 'valence', 'tempo_bpm', 'acousticness', 'production_quality', 'artist_familiarity']
     for feature in numerical_features:
         pref_val = user_prefs.get(feature, 0.5)
         song_val = song.get(feature, 0.5)
@@ -221,6 +405,20 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
             reasons.append(f"🎯 {feature} excellent match ({song_val:.2f} ≈ {pref_val:.2f})")
         elif similarity > 0.7:
             reasons.append(f"✓ {feature} good match ({song_val:.2f})")
+
+    # Popularity scoring: higher popularity bonus (normalized 0-100 to 0-1)
+    min_popularity = user_prefs.get('min_popularity', 30.0)
+    song_popularity = song.get('popularity', 50.0) / 100.0
+    if song.get('popularity', 50.0) >= min_popularity:
+        pop_similarity = min(1.0, song_popularity * 1.2)
+        pop_contribution = weights['popularity'] * pop_similarity
+        score += pop_contribution
+        contributions['popularity'] = (pop_contribution, pop_similarity, song.get('popularity', 50.0), min_popularity)
+        if pop_similarity > 0.8:
+            reasons.append(f"⭐ popularity strong ({song.get('popularity', 50.0):.0f}/100)")
+    else:
+        score -= 0.3  # Penalty for songs below minimum popularity threshold
+        contributions['popularity'] = (-0.3, 0.0, song.get('popularity', 50.0), min_popularity)
 
     # Categorical features: exact match scoring
     mood_match = song['mood'] == user_prefs.get('mood')
@@ -252,7 +450,7 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = Fal
             logger.debug(f"  genre: no match ({song['genre']} ≠ {user_prefs.get('genre')})")
 
     if verbose:
-        logger.info(f"  ➜ Final score: {round(score, 3):.3f}/7.9 (max)")
+        logger.info(f"  ➜ Final score: {round(score, 3):.3f}/9.5 (max)")
 
     return round(score, 3), reasons
 
