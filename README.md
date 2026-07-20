@@ -781,14 +781,19 @@ You will go deeper on this in your model card.
 
 ## Reflection
 
-Read and complete `model_card.md`:
+Read the [**Model Card**](model_card.md) for a full analysis of system behavior, biases, and evaluation results.
 
-[**Model Card**](model_card.md)
+### Personal Engineering Reflection
 
-Write 1 to 2 paragraphs here about what you learned:
+**Biggest Learning Moment**: The moment I ran sensitivity testing and discovered that doubling energy weight brought "Storm Runner" (a rock song) back into pop recommendations was revelatory. Before that, I thought our weight choices were arbitrary—more genre weight was just "a good idea." But the experiment proved the opposite: the weights are *necessary solutions* to specific problems. Doubling energy from 1.2 → 2.4 reintroduced the exact contamination we'd fixed by increasing genre weight from 2.0 → 2.3. This taught me that optimization isn't about finding "the best" weights—it's about finding the *trade-offs* that matter and making deliberate choices. You can't maximize both genre coherence AND cross-genre discovery with the same weights. Every design choice is a bet on what users care about most.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+**How AI Tools Helped (and When to Verify)**: Claude helped me think through the math, organize the experimental design, and articulate findings in clear language. But I had to double-check three things: (1) the sensitivity test math—I manually validated that the new max_score (7.45) was correct when we changed weights. (2) The profile comparisons—I ran the actual code to see real scores instead of trusting my intuition about how songs would rank. (3) The "Gym Hero" explanation—I had to manually trace through the scoring formula to confirm that a song with the "wrong" mood could still rank #2 when other features aligned. The pattern I noticed: AI is great at helping you think broadly and write clearly, but you *must* verify any specific numerical claims by running the actual code.
+
+**What Surprised Me About Simple Algorithms**: The most shocking discovery was that transparency matters more than I expected. "Gym Hero" is objectively worse for a "happy pop" listener—it has the wrong mood. But when you show the math ("you're getting 85% of what you asked for"), users accept it. A user can understand: "Genre is crucial, so +2.3. Energy is nearly perfect, so +1.2. Mood doesn't match, so −0.5." That's 3.0 base points before other features, and it lands the song in top-5. The simplicity of the algorithm—just weighted features and a bell curve—somehow *feels* intelligent because the explanations are honest. Real recommender systems hide their reasoning (Netflix, Spotify, YouTube), which makes wrong recommendations feel arbitrary. Ours feels fair because you can see the math.
+
+**What I'd Try Next**: (1) **Semantic genre similarity** using embeddings—so synthwave gets partial credit for being similar to synth pop. Right now, genre matching is all-or-nothing, which locks users into one sound. (2) **Mood embeddings** to handle "reflective" ≈ "calm"—I noticed rare moods disappear entirely because users can't describe them precisely. (3) **Behavioral signals** like skip rates—the system right now only knows what users say they like, not what they actually play. A third experiment would be A/B testing with real users to see if the mood penalty (−0.5) actually makes recommendations feel better, or if it just manipulates the math. The biggest risk in building recommenders is that you optimize for metrics (genre coherence, score diversity) that don't match what users actually want.
+
+---
 
 
 
