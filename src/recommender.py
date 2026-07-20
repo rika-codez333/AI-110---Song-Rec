@@ -2,6 +2,13 @@ from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import math
 import csv
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Song:
@@ -42,9 +49,18 @@ class Recommender:
     def __init__(self, songs: List[Song]):
         self.songs = songs
 
-    def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
+    def recommend(self, user: UserProfile, k: int = 5, tuning_param: float = 1.0, verbose: bool = False) -> List[Song]:
         """
         Recommends top-k songs based on user profile using proximity-based content filtering.
+
+        Args:
+            user: UserProfile with preferences
+            k: Number of recommendations (default 5)
+            tuning_param: Gaussian k parameter (0.5=loose, 1.0=standard, 2.0=strict)
+            verbose: If True, logs detailed scoring breakdown
+
+        Returns:
+            List of top-k Song objects, ranked by score
         """
         user_prefs = {
             'genre': user.favorite_genre,
@@ -55,6 +71,9 @@ class Recommender:
             'tempo_bpm': user.preferred_tempo_bpm,
             'acousticness': user.preferred_acousticness,
         }
+
+        if verbose:
+            logger.info(f"Recommending top-{k} songs | User: genre={user.favorite_genre}, mood={user.favorite_mood}, energy={user.target_energy}")
 
         scored_songs = []
         for song in self.songs:
@@ -70,15 +89,30 @@ class Recommender:
                 'danceability': song.danceability,
                 'acousticness': song.acousticness,
             }
-            score, _ = score_song(user_prefs, song_dict)
+            score, _ = score_song(user_prefs, song_dict, k=tuning_param, verbose=verbose)
             scored_songs.append((song, score))
 
         ranked = sorted(scored_songs, key=lambda x: -x[1])
+
+        if verbose:
+            logger.info(f"Top-{k} recommendations:")
+            for idx, (song, score) in enumerate(ranked[:k], 1):
+                logger.info(f"  {idx}. {song.title} ({song.artist}) - Score: {score:.3f}/7.8")
+
         return [song for song, _ in ranked[:k]]
 
-    def explain_recommendation(self, user: UserProfile, song: Song) -> str:
+    def explain_recommendation(self, user: UserProfile, song: Song, tuning_param: float = 1.0, verbose: bool = False) -> str:
         """
         Explains why a song was recommended to a user.
+
+        Args:
+            user: UserProfile with preferences
+            song: Song to explain
+            tuning_param: Gaussian k parameter
+            verbose: If True, logs the explanation
+
+        Returns:
+            String explanation with score and contributing factors
         """
         user_prefs = {
             'genre': user.favorite_genre,
@@ -103,8 +137,12 @@ class Recommender:
             'acousticness': song.acousticness,
         }
 
-        score, reasons = score_song(user_prefs, song_dict)
-        explanation = f"Score: {score:.3f}\n" + "\n".join(reasons)
+        score, reasons = score_song(user_prefs, song_dict, k=tuning_param, verbose=verbose)
+        explanation = f"Score: {score:.3f}/7.8\n" + "\n".join(reasons)
+
+        if verbose:
+            logger.info(f"Explaining '{song.title}': {explanation.replace(chr(10), ' | ')}")
+
         return explanation
 
 def load_songs(csv_path: str) -> List[Dict]:
@@ -130,34 +168,45 @@ def load_songs(csv_path: str) -> List[Dict]:
             songs.append(song)
     return songs
 
-def score_song(user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, List[str]]:
+def score_song(user_prefs: Dict, song: Dict, k: float = 1.0, verbose: bool = False) -> Tuple[float, List[str]]:
     """
     Scores a single song against user preferences using proximity-based Gaussian similarity.
+
+    Option D Recipe: Balanced discovery with exact-match priority
+    - Genre match: +2.0 | Mood match: +1.0
+    - Energy: +1.4 | Danceability: +1.2 | Valence: +1.0
+    - Tempo: +0.6 | Acousticness: +0.6
+    - Max score: 7.8
 
     Args:
         user_prefs: Reference song preferences (e.g., user's liked song or target profile)
         song: Song to score
-        k: Gaussian tuning parameter (higher = stricter matching, default 1.0)
+        k: Gaussian tuning parameter (0.5=loose, 1.0=standard, 2.0=strict, default 1.0)
+        verbose: If True, logs detailed scoring breakdown for this song
 
     Returns:
-        (score, reasons): Score (0-1) and list of contributing factors
+        (score, reasons): Score (0-7.8 max) and list of contributing factors
     """
-    # Default weights (hybrid model)
+    # Option D: Full-balanced weighting strategy
     weights = {
-        'energy': 0.25,
-        'valence': 0.20,
-        'danceability': 0.20,
-        'mood': 0.15,
-        'tempo_bpm': 0.10,
-        'genre': 0.05,
-        'acousticness': 0.05,
+        'genre': 2.0,
+        'mood': 1.0,
+        'energy': 1.4,
+        'danceability': 1.2,
+        'valence': 1.0,
+        'tempo_bpm': 0.6,
+        'acousticness': 0.6,
     }
 
     score = 0.0
     reasons = []
+    contributions = {}
+
+    if verbose:
+        logger.info(f"Scoring '{song.get('title', 'Unknown')}' | k={k} (tuning: 0.5=loose, 1.0=standard, 2.0=strict)")
 
     # Numerical features: Gaussian similarity (proximity-based)
-    numerical_features = ['energy', 'valence', 'danceability', 'tempo_bpm', 'acousticness']
+    numerical_features = ['energy', 'danceability', 'valence', 'tempo_bpm', 'acousticness']
     for feature in numerical_features:
         pref_val = user_prefs.get(feature, 0.5)
         song_val = song.get(feature, 0.5)
@@ -165,6 +214,10 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, Lis
         similarity = math.exp(-k * distance_squared)
         contribution = weights[feature] * similarity
         score += contribution
+        contributions[feature] = (contribution, similarity, song_val, pref_val)
+
+        if verbose:
+            logger.debug(f"  {feature}: similarity={similarity:.3f}, contribution={contribution:.3f} ({song_val:.2f} vs {pref_val:.2f})")
 
         if similarity > 0.9:
             reasons.append(f"🎯 {feature} excellent match ({song_val:.2f} ≈ {pref_val:.2f})")
@@ -172,17 +225,37 @@ def score_song(user_prefs: Dict, song: Dict, k: float = 1.0) -> Tuple[float, Lis
             reasons.append(f"✓ {feature} good match ({song_val:.2f})")
 
     # Categorical features: exact match scoring
-    if song['mood'] == user_prefs.get('mood'):
-        score += weights['mood']
-        reasons.append(f"🎭 mood matches ({song['mood']})")
+    mood_match = song['mood'] == user_prefs.get('mood')
+    genre_match = song['genre'] == user_prefs.get('genre')
 
-    if song['genre'] == user_prefs.get('genre'):
+    if mood_match:
+        score += weights['mood']
+        contributions['mood'] = (weights['mood'], 1.0, song['mood'], user_prefs.get('mood'))
+        reasons.append(f"🎭 mood matches ({song['mood']})")
+        if verbose:
+            logger.debug(f"  mood: MATCH +{weights['mood']:.1f}")
+    else:
+        contributions['mood'] = (0.0, 0.0, song['mood'], user_prefs.get('mood'))
+        if verbose:
+            logger.debug(f"  mood: no match ({song['mood']} ≠ {user_prefs.get('mood')})")
+
+    if genre_match:
         score += weights['genre']
+        contributions['genre'] = (weights['genre'], 1.0, song['genre'], user_prefs.get('genre'))
         reasons.append(f"🎸 genre matches ({song['genre']})")
+        if verbose:
+            logger.debug(f"  genre: MATCH +{weights['genre']:.1f}")
+    else:
+        contributions['genre'] = (0.0, 0.0, song['genre'], user_prefs.get('genre'))
+        if verbose:
+            logger.debug(f"  genre: no match ({song['genre']} ≠ {user_prefs.get('genre')})")
+
+    if verbose:
+        logger.info(f"  ➜ Final score: {round(score, 3):.3f}/7.8 (max)")
 
     return round(score, 3), reasons
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, List[str]]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, tuning_param: float = 1.0, verbose: bool = False) -> List[Tuple[Dict, float, List[str]]]:
     """
     Ranks all songs by score and returns top-k recommendations.
 
@@ -190,15 +263,26 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tup
         user_prefs: User preference profile (e.g., favorite song or UserProfile as dict)
         songs: List of songs to score
         k: Number of recommendations to return (default 5)
+        tuning_param: Gaussian k parameter (0.5=loose, 1.0=standard, 2.0=strict, default 1.0)
+        verbose: If True, logs detailed scoring for each song
 
     Returns:
         List of (song_dict, score, reasons) tuples, sorted by score descending
     """
     scored_songs = []
 
+    if verbose:
+        logger.info(f"Recommending top-{k} songs for user with prefs: {user_prefs}")
+
     for song in songs:
-        score, reasons = score_song(user_prefs, song)
+        score, reasons = score_song(user_prefs, song, k=tuning_param, verbose=verbose)
         scored_songs.append((song, score, reasons))
 
     ranked = sorted(scored_songs, key=lambda x: -x[1])
+
+    if verbose:
+        logger.info(f"Top {k} recommendations:")
+        for idx, (song, score, _) in enumerate(ranked[:k], 1):
+            logger.info(f"  {idx}. {song.get('title', 'Unknown')} - {score:.3f}/7.8")
+
     return ranked[:k]

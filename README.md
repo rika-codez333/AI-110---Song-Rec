@@ -33,19 +33,54 @@ The system represents a user's taste through four core preferences:
 - `likes_acoustic` — boolean for acoustic vs. electronic preference
 
 **Scoring Algorithm** (Content-Based Proximity Matching):
-Each song receives a score based on how close its audio features match the user's preferences:
-```
-SCORE = 0.25×energy + 0.20×valence + 0.20×danceability + 
-         0.15×mood_match + 0.10×tempo + 0.05×genre_match + 0.05×acousticness
+Each song receives a score based on how close its audio features match the user's preferences.
 
-Where numeric features use Gaussian similarity: exp(-k * (user_pref - song_value)²)
-And categorical features use exact matching: 1.0 if match, 0.0 otherwise
+### Algorithm Recipe (Option D: Balanced Discovery)
+
+**Weights per Feature** (maximum score: 7.8):
+| Feature | Weight | Scoring Method |
+|---------|--------|-----------------|
+| Genre | 2.0 | Exact match: +2.0 if match, 0 otherwise |
+| Mood | 1.0 | Exact match: +1.0 if match, 0 otherwise |
+| Energy | 1.4 | Gaussian similarity: 1.4 × exp(-k × distance²) |
+| Danceability | 1.2 | Gaussian similarity: 1.2 × exp(-k × distance²) |
+| Valence | 1.0 | Gaussian similarity: 1.0 × exp(-k × distance²) |
+| Tempo (BPM) | 0.6 | Gaussian similarity: 0.6 × exp(-k × distance²) |
+| Acousticness | 0.6 | Gaussian similarity: 0.6 × exp(-k × distance²) |
+
+**Formula**:
 ```
+TOTAL_SCORE = genre_contrib + mood_contrib + energy_contrib + 
+              danceability_contrib + valence_contrib + tempo_contrib + acousticness_contrib
+
+Where:
+- genre_contrib = 2.0 if (song.genre == user.favorite_genre) else 0.0
+- mood_contrib = 1.0 if (song.mood == user.favorite_mood) else 0.0
+- numeric_contrib = weight × exp(-k × (user_preference - song_value)²)
+- k = tuning_param (0.5=loose/forgiving, 1.0=standard, 2.0=strict)
+```
+
+**Intuition**: The system rewards songs that match audio features *close to* what the user likes (via Gaussian), without penalizing songs that differ. Genre and mood are exact-match categorical filters—a critical design choice that emphasizes user intent over serendipity.
 
 **Ranking & Recommendation**:
-1. Score all available songs independently
-2. Sort by score (descending)
+1. Score all available songs independently using the formula above
+2. Sort by total score (descending)
 3. Return top-k recommendations with explainable reasons for each pick
+4. Explanations highlight which features contributed most to the score (marked with 🎯 for excellent matches >0.9 similarity, ✓ for good matches >0.7)
+
+### Potential Biases in This System
+
+1. **Heavy Genre Preference**: Genre is weighted at 2.0 (25.6% of max score), making exact-match genre the strongest factor. This system might **over-prioritize familiar genres and miss great cross-genre discoveries**. A user who loves "pop" might miss an amazing "lofi" acoustic track with identical energy/mood characteristics.
+
+2. **Categorical Mood Rigidity**: Mood uses exact matching (chill = chill, intense = intense), with no similarity metric. **A song with mood="chill" won't match a user preferring mood="relaxed," even though they're semantically identical.** This creates artificial "cliffs" in recommendations.
+
+3. **Gaussian Centering on User Preferences**: The Gaussian similarity rewards songs matching the user's *exact* preferences (e.g., target_energy = 0.5). This can **suppress unexpected discoveries**—a high-energy song that matches mood and genre perfectly might score lower than a mediocre low-energy song if the user's target_energy doesn't match.
+
+4. **Tiny Catalog Bias**: Recommendations are only as diverse as the training data. A 30-song catalog won't find the perfect song in a library of millions.
+
+5. **No Temporal or Popularity Signals**: The system doesn't account for song release date, artist popularity, or trending status. Very old or niche songs might not be recommended despite matching features.
+
+6. **No Feedback Loop**: The system is static—it doesn't learn from user behavior (skips, replays, saves). Real systems like Spotify adjust weights after each interaction.
 
 ---
 
